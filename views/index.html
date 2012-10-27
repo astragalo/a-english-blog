@@ -1,0 +1,292 @@
+<!--Static WebPage-->
+<!Doctype html>
+<html lang="es">
+<head>
+	<meta charset="utf-8">
+	<title>English blog</title>
+	<link href='http://fonts.googleapis.com/css?family=Marcellus' rel='stylesheet' type='text/css'>                         
+	<script src="https://raw.github.com/DmitryBaranovskiy/raphael/master/raphael-min.js"></script>
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+	<script src="/socket.io/socket.io.js"></script>
+	<style type="text/css">
+	body{
+		background-image: url(http://4.bp.blogspot.com/_1E-ebc1qY5w/TCjp3LPZzMI/AAAAAAAAI2o/i0FrCOGCK4Y/s1600/9.jpg);
+		background-attachment: fixed;
+		 background-position: top center;
+		background-repeat:no-repeat;
+	}
+	#franja-banner{
+		background:rgba(0,0,0,0.3);
+		height:100px ;
+		position: absolute;
+		top:3em;
+		right:0px;
+		width:100%;
+		z-index: 1;
+		transition: all 2s;
+		-mozy-transition: all 2s;
+		-webkit-transition: all 2s;
+		-o-transition: all 2s;
+	}
+	#franja-banner:hover{
+		background:rgba(0,0,0,0.7);
+	}
+	header{
+		color:#FFFFFF;
+		font-size: 3em;
+		font-family: Collegiate , Helvetica;
+		margin:0px auto;
+		position:absolute;
+		text-align: center;
+		text-shadow:2px 2px 2px rgba(0,0,0,0.6);
+		top:1em;
+		z-index:2 ;
+	}
+	#seccion{
+		background: rgba(255,255,255,0.6);
+		box-shadow:0px 0px 10px rgba(0,0,0,0.6);
+		height:800px;
+		width:75%;
+		margin: 0px auto;
+		position:absolute;
+		top:8em;
+		z-index:3;
+	}
+	#banner{
+		margin:0px auto 0px auto;
+	}
+	#banner:hover{
+
+	}
+	h1{
+		font-size: 2em;
+		font-family: Collegiate, Helvetica;
+		font-weight: bolder;
+		text-align: center;
+	}
+	#line-p{
+
+		text-align:center;
+		font-size:2em ;
+		text-shadow: 2px 2px 5px rgba(0,0,0,0.4);
+
+	}
+	p{
+		font-size: 1.5em;
+		font-family: 'Marcellus', serif;
+
+	}
+	aside{
+		position:;
+	}
+	img{
+		height:120px ;
+		padding:10px;
+		width:95%;
+	}
+	a{
+		text-decoration:inherit  ;
+	}
+	footer{
+	font-family: Collegiate,Helvetica;
+	width:100%;
+	height:50px;	
+	color: #FFFFFF;
+	background-color:#000000;
+	position:absolute;
+	bottom:0;
+	left:0px;
+	text-align: center;
+	z-index:4;
+	}
+	.fb-like{
+		background-color: #000;
+	bottom:0px;
+	left:0px;
+	padding:10px;
+	position: static;
+	z-index:5;
+	
+	}
+	#cuerpo{
+	background: rgba(199,201,197,0.4);
+	border-radius: 5px;
+	padding:5px;
+
+}
+#tweetform{
+	width:300px;
+}
+#forma{
+	background-color:#1C1C1C ;
+	border-radius: 5px;
+}
+.u{
+
+	background-color:#A4A4A4;
+	border-radius: 5px;
+	font-family:'Marcellus';
+	font-weight: bolder;
+	font-size: 1.2em;
+	margin-right: 11px;
+	display: inline-block;
+	padding:5px;
+
+}
+
+.t{
+	background-color:#D8D8D8;
+	border-radius: 5px;
+	font-family:'Helvetica';
+	font-weight: normal;
+	font-size: 1em;
+	display: inline-block;
+	padding:5px;
+}
+.rem{background:inherit;
+	position: absolute;
+	display: inline-block;
+		height:30px;
+		right:20px;
+		width:30px;
+		color:#CEECF5;
+		font-size: 25px;
+		transition: all 1s;
+		-mozy-transition: all 1s;
+		-webkit-transition: all 1s;
+		-o-transition: all 1s;	}
+.rem:hover{
+	color:#848484;
+	cursor:pointer;	
+}
+.fav{background:inherit;
+	position: absolute;
+	display: inline-block;
+		height:30px;
+		right:60px;
+		width:30px;
+		color:#CEECF5;
+		font-size: 25px;
+		transition: all 2s;
+		-mozy-transition: all 2s;
+		-webkit-transition: all 2s;
+		-o-transition: all 2s;	}
+.fav:hover{
+	color:#848484;
+	cursor:pointer;	
+}
+input{
+	display:inline-block;
+}
+li{
+	text-decoration: none;
+	list-style-type: none;
+	height:50px;
+	margin-top: 3px;
+	margin-bottom: 1px;
+}
+em{
+	text-decoration: inherit;
+	color: #333333;
+	font-family: 'Marcellus';
+	display:inline-block;
+}
+
+	</style>
+	<script language="javascript">
+		$(document).on('ready',function(){
+			var websocket = io.connect();
+			websocket.emit('emitwit');
+
+			$("#forma").on('submit', function () {
+				var mensaje = $("#tweetform").val();
+				var user = $("#usuarioid").val();
+
+				websocket.emit('formularioenv',mensaje);
+				websocket.emit('userenv',user);	
+			});
+			//"emit no debe estar anidadado en otro emit, esto causara problemas con socket.io"
+
+			websocket.on('twitting', function(tweets,usua){
+				$("li").remove();
+
+					for (var i = tweets.length; i >= 0; i--) {
+						if(tweets[i]==undefined||usua[i]==undefined){}else{
+
+						$('#contenedor').append('<li ><em class="u">'+ 
+						 	usua[i]+' dice:</em><em class></em><em class="t" >'+
+							tweets[i]+'</em><em class="rem"> ✖ </em><em class="fav">✔</em><em class="'+tweets[i]+'"></em></li>').slideDown(3000);
+
+
+					//esta bien!!!!	
+					$('.rem').on('click', function(){
+						 var del=$(this).next().next().attr('class')
+						$(this).parent().empty();
+						$(this).empty();
+						websocket.emit('borrar',del);
+						console.log(del);
+					});
+									}			
+				};});
+
+		});
+	</script>
+</head>
+<body>
+	<div id="fb-root"></div>
+<script>(function(d, s, id) {
+  var js, fjs = d.getElementsByTagName(s)[0];
+  if (d.getElementById(id)) return;
+  js = d.createElement(s); js.id = id;
+  js.src = "//connect.facebook.net/es_LA/all.js#xfbml=1";
+  fjs.parentNode.insertBefore(js, fjs);
+}(document, 'script', 'facebook-jssdk'));</script>
+	<!--aqui empieza el blog-->
+	<div id="franja-banner"> </div>
+	<header>English Technology Blog</header>
+	<div id="seccion">
+		<div id="banner">
+			<!--imagen del banner-->
+			<img src="http://1.bp.blogspot.com/-kHDdfV0gBq0/UE0yEkXPsEI/AAAAAAAAAAo/fbIuVsovzuw/s1600/banner-paisajes-noruegos.jpg"
+			>
+		</div>
+		<!--aqui comienza la seccion del articulo-->
+
+		<article>
+			<h1>Tech Article</h1>
+			<p>Hello folks! This blog was made with the 
+				purpose of presentation for a homework
+				in school. 
+				The technology is awesome, but sometimes
+				 it can get very messed up with economic issues involved.
+				 Two opposite cases are the the open-source project of Linux and the 
+				 Most recent iPad Mini. Linus Torvalds was a guy who programmed in language C
+				 when he used to be young, then he realized that he also had the capabilities 
+				 to design a Core for a computer and after more than 4 years he presented to the developer community the Linux OS with Unix Core included. In our days
+				 the Unix Core still have relevance in the most recent featured devices. 
+				 The opposite example could be the iPad Mini, That doesn´t have retina Display.
+				 Apple, seriously, we are your costumers and with so many innovations this days with the Android Trademark you give us a tablet without HD and a stupid price? Think about it.
+
+			</p>
+		</article>
+		<aside>
+			<h2>Comments</h2>
+
+		</aside>
+		<div id="cuerpo">
+		<form id="forma" ><h2>
+			<svg height="32" width="32" xmlns="http://ww.w3.org/2000/svg" style="overflow:hidden; position:relative;" >
+		<path style="" fill="#F2F2F2" stroke="none" d="M20.771,12.364c0,0,0.849-3.51,0-4.699c-0.85-1.189-1.189-1.981-3.058-2.548s-1.188-0.454-2.547-0.396c-1.359,0.057-2.492,0.792-2.492,1.188c0,0-0.849,0.057-1.188,0.397c-0.34,0.34-0.906,1.924-0.906,2.321s0.283,3.058,0.566,3.624l-0.337,0.113c-0.283,3.283,1.132,3.68,1.132,3.68c0.509,3.058,1.019,1.756,1.019,2.548s-0.51,0.51-0.51,0.51s-0.452,1.245-1.584,1.698c-1.132,0.452-7.416,2.886-7.927,3.396c-0.511,0.511-0.453,2.888-0.453,2.888h26.947c0,0,0.059-2.377-0.452-2.888c-0.512-0.511-6.796-2.944-7.928-3.396c-1.132-0.453-1.584-1.698-1.584-1.698s-0.51,0.282-0.51-0.51s0.51,0.51,1.02-2.548c0,0,1.414-0.397,1.132-3.68H20.771z"><path/></svg>
+			<input id="usuarioid" type="text" lenght="18" name="user" required></h2><h2>
+			<svg height="32" width="32" xmlns="http://ww.w3.org/2000/svg" style="overflow:hidden; position:relative;" >
+		<path style="" fill="#F2F2F2" stroke="none" d="M2.021,9.748L2.021,9.748V9.746V9.748zM2.022,9.746l5.771,5.773l-5.772,5.771l2.122,2.123l7.894-7.895L4.143,7.623L2.022,9.746zM12.248,23.269h14.419V20.27H12.248V23.269zM16.583,17.019h10.084V14.02H16.583V17.019zM12.248,7.769v3.001h14.419V7.769H12.248z"><path/></svg>
+			<input id="tweetform" type="text" lenght="140" name="tweet" required></h2><h2>
+			<input id="sum"type="submit" value="Comment!"></h2>
+		</form>
+	<div id="contenedor"></div>
+	</div>
+	</div>
+	<!--<footer id="contacto">Page created in 3 hours.</footer>-->
+	<div class="fb-like" data-href="http://a-english-blog.jit.su/" data-send="true" data-layout="button_count" data-width="300" data-show-faces="false" data-colorscheme="dark" data-font="arial"></div>
+</body>
+</html>
